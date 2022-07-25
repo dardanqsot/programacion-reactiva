@@ -11,6 +11,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @SpringBootApplication
 public class SpringBootReactorApplication implements CommandLineRunner {
@@ -22,10 +23,32 @@ public class SpringBootReactorApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        ejemploIterable();
-        ejemploflatMap();
+        ejemploToString();
     }
 
+    public void ejemploToString() throws Exception {
+        List<Usuario> usuariosList = new ArrayList<>();
+        usuariosList.add(new Usuario("Darwin",  "Quispe"));
+        usuariosList.add(new Usuario("Pedro", "Sanchez"));
+        usuariosList.add(new Usuario("Daniel", "Soto "));
+        usuariosList.add(new Usuario("Daniel", "Soto"));
+        usuariosList.add(new Usuario("Diego", "Suarez"));
+        usuariosList.add(new Usuario("Bruce", "Lee"));
+        usuariosList.add(new Usuario("Bruce", "Willis"));
+
+        Flux.fromIterable(usuariosList)
+                .map(usuario -> usuario.getNombre().toUpperCase().concat(" ").concat(usuario.getApellido().toUpperCase()))
+                .flatMap(nombre -> {
+                    if(nombre.contains("Bruce".toUpperCase())){
+                        return Mono.just(nombre);
+                    } else {
+                        return Mono.empty();
+                    }
+                })
+                .map(nombre -> {
+                    return nombre.toLowerCase();
+                }).subscribe(u -> log.info(u.toString()));
+    }
     public void ejemploflatMap() throws Exception {
         List<String> usuariosList = new ArrayList<>();
         usuariosList.add("Darwin Quispe");
